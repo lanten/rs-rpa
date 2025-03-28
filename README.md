@@ -1,8 +1,6 @@
 # rs-rpa
 
-基于 windows-rs 实现的 win32 gui rpa 工具
-
-通过 cli 命令与其它语言交互
+基于 windows-rs 实现的 win32 gui rpa 命令行工具
 
 ```
 Usage: rs-rpa.exe <COMMAND>
@@ -31,7 +29,7 @@ Usage: rs-rpa.exe {find|--find|-f} [OPTIONS]
 Options:
   -c, --class <class>...  目标窗口类名
   -n, --name <name>...    目标窗口名称/标题
-  -e, --express           精确匹配窗口类名或标题
+  -e, --exact           精确匹配窗口类名或标题
   -v, --visible-only      只查找可见窗口
   -h, --help              Print help
 ```

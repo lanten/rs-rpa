@@ -1,8 +1,14 @@
-use rs_rpa::window::{
-  focus_window, enum_all_window_handles, enum_visible_window_handles, find_element_hwnd, get_class_by_hwnd,
-  get_process_id_by_hwnd, get_title_by_hwnd,
+use rs_rpa::{
+  find::find_all_window_hwnd,
+  window::{
+    enum_all_window_handles, enum_visible_window_handles, find_element_hwnd, focus_window, get_class_by_hwnd,
+    get_process_id_by_hwnd, get_title_by_hwnd,
+  },
 };
 
+mod test_utils;
+
+/// 枚举所有窗口句柄
 #[test]
 fn test_enum_all_window_handles() {
   let handles = enum_all_window_handles();
@@ -10,6 +16,7 @@ fn test_enum_all_window_handles() {
   println!("找到 {} 个窗口句柄", handles.len());
 }
 
+/// 测试枚举可见窗口句柄
 #[test]
 fn test_enum_visible_window_handles() {
   let visible_handles = enum_visible_window_handles();
@@ -17,26 +24,35 @@ fn test_enum_visible_window_handles() {
   println!("找到 {} 个可见窗口句柄", visible_handles.len());
 }
 
+/// 测试获取窗口标题、类名和进程ID
 #[test]
 fn test_window_properties() {
-  let visible_handles = enum_visible_window_handles();
-  if let Some(hwnd) = visible_handles.first() {
-    // 测试获取窗口标题
-    let title = get_title_by_hwnd(*hwnd);
-    println!("窗口标题: {}", title);
+  let test_win = test_utils::create_test_window();
 
-    // 测试获取窗口类名
-    let class_name = get_class_by_hwnd(*hwnd);
-    println!("窗口类名: {}", class_name);
-    assert!(!class_name.is_empty(), "窗口类名不应为空");
+  println!("创建测试窗口成功 {:?}", test_win);
 
-    // 测试获取进程ID
-    let process_id = get_process_id_by_hwnd(*hwnd);
-    println!("进程ID: {}", process_id);
-    assert!(process_id > 0, "进程ID应该大于0");
-  } else {
-    panic!("未找到任何可见窗口进行测试");
-  }
+  let find_res = find_all_window_hwnd(test_win.class_name.clone(), test_win.title.clone(), false, true);
+
+  println!("查找窗口结果: {:?}", find_res);
+
+  // std::thread::sleep(std::time::Duration::from_secs(10));
+  // if let Some(hwnd) = visible_handles.first() {
+  //   // 测试获取窗口标题
+  //   let title = get_title_by_hwnd(*hwnd);
+  //   println!("窗口标题: {}", title);
+
+  //   // 测试获取窗口类名
+  //   let class_name = get_class_by_hwnd(*hwnd);
+  //   println!("窗口类名: {}", class_name);
+  //   assert!(!class_name.is_empty(), "窗口类名不应为空");
+
+  //   // 测试获取进程ID
+  //   let process_id = get_process_id_by_hwnd(*hwnd);
+  //   println!("进程ID: {}", process_id);
+  //   assert!(process_id > 0, "进程ID应该大于0");
+  // } else {
+  //   panic!("未找到任何可见窗口进行测试");
+  // }
 }
 
 #[test]

@@ -40,8 +40,8 @@ pub fn commands() -> Command {
             .num_args(1..),
         )
         .arg(
-          Arg::new("express")
-            .long("express")
+          Arg::new("exact")
+            .long("exact")
             .short('e')
             .help("精确匹配窗口类名或标题")
             .action(ArgAction::SetTrue)
@@ -176,9 +176,9 @@ pub fn match_commands() {
     Some(("find", sub_matches)) => {
       let class = sub_matches.get_one::<String>("class");
       let name = sub_matches.get_one::<String>("name");
-      let express = sub_matches.get_flag("express");
+      let exact = sub_matches.get_flag("exact");
       let visible_only = sub_matches.get_flag("visible-only");
-      let result = find_all_window_hwnd(parse_args_string(class), parse_args_string(name), visible_only, express);
+      let result = find_all_window_hwnd(parse_args_string(class), parse_args_string(name), visible_only, exact);
       println!("{}", serde_json::to_string_pretty(&result).unwrap());
     }
 

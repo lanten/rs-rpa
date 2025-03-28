@@ -45,7 +45,10 @@ pub fn get_title_by_hwnd(hwnd: HWND) -> String {
     if length > 0 {
       let mut buffer = vec![0u16; (length + 1) as usize];
       GetWindowTextW(hwnd, &mut buffer);
-      String::from_utf16_lossy(&buffer)
+      let title = String::from_utf16_lossy(&buffer);
+      // 去除末尾的空字符
+      let title = title.trim_end_matches('\0').to_string();
+      title
     } else {
       String::new()
     }
