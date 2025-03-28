@@ -1,9 +1,9 @@
 use crate::{
-  element::{click_button, enable_button, send_text_to},
+  element::{click_button, enable_element, send_text_to},
   find::{find_all_window_hwnd, find_element},
   keyboard::send_keys_to,
   utils::{hwnd::string_to_hwnd, result},
-  window::activate_window,
+  window::focus_window,
 };
 use clap::{crate_description, crate_version, Arg, ArgAction, Command};
 
@@ -18,7 +18,7 @@ pub fn commands() -> Command {
     // 查找目标窗口
     .subcommand(
       Command::new("find")
-        .short_flag('F')
+        .short_flag('f')
         .long_flag("find")
         .about("查找目标窗口")
         .arg(
@@ -60,7 +60,7 @@ pub fn commands() -> Command {
     //
     // 查找子元素句柄
     .subcommand(
-      Command::new("find-element")
+      Command::new("fel")
         .long_flag("find-element")
         .about("查找子元素句柄")
         .arg(
@@ -93,7 +93,7 @@ pub fn commands() -> Command {
     //
     // 向目标句柄投递文本
     .subcommand(
-      Command::new("send-text")
+      Command::new("send")
         .long_flag("send-text")
         .about("向目标句柄投递文本")
         .arg(
@@ -128,53 +128,44 @@ pub fn commands() -> Command {
             .default_value("50"),
         ),
     )
-    // active-window
+    // focus-window
     //
-    // 触发按钮点击事件
+    // 聚焦窗口
     .subcommand(
-      Command::new("active-window")
-        .long_flag("active-window")
-        .about("激活目标窗口")
-        .arg(
-          Arg::new("handle")
-            .long("handle")
-            .action(ArgAction::Set)
-            .required(true)
-            .num_args(1..)
-            .help("目标窗口句柄"),
-        ),
+      Command::new("focus").long_flag("focus-window").about("激活目标窗口").arg(
+        Arg::new("handle")
+          .long("handle")
+          .action(ArgAction::Set)
+          .required(true)
+          .num_args(1..)
+          .help("目标窗口句柄"),
+      ),
     )
     // click-button
     //
     // 触发按钮点击事件
     .subcommand(
-      Command::new("click-button")
-        .long_flag("click-button")
-        .about("触发按钮点击事件")
-        .arg(
-          Arg::new("handle")
-            .long("handle")
-            .action(ArgAction::Set)
-            .required(true)
-            .num_args(1..)
-            .help("目标元素句柄"),
-        ),
+      Command::new("click").long_flag("click-button").about("触发按钮点击事件").arg(
+        Arg::new("handle")
+          .long("handle")
+          .action(ArgAction::Set)
+          .required(true)
+          .num_args(1..)
+          .help("目标元素句柄"),
+      ),
     )
     // enable-button
     //
-    // 解除按钮禁用
+    // 解除元素禁用
     .subcommand(
-      Command::new("enable-button")
-        .long_flag("enable-button")
-        .about("解除按钮禁用")
-        .arg(
-          Arg::new("handle")
-            .long("handle")
-            .action(ArgAction::Set)
-            .required(true)
-            .num_args(1..)
-            .help("目标元素句柄"),
-        ),
+      Command::new("enable").long_flag("enable-element").about("解除元素禁用").arg(
+        Arg::new("handle")
+          .long("handle")
+          .action(ArgAction::Set)
+          .required(true)
+          .num_args(1..)
+          .help("目标元素句柄"),
+      ),
     )
 }
 
@@ -191,7 +182,7 @@ pub fn match_commands() {
       println!("{}", serde_json::to_string_pretty(&result).unwrap());
     }
 
-    Some(("find-element", sub_matches)) => {
+    Some(("fel", sub_matches)) => {
       let parent = sub_matches.get_one::<String>("parent");
       let class = sub_matches.get_one::<String>("class");
       let name = sub_matches.get_one::<String>("name");
@@ -199,7 +190,7 @@ pub fn match_commands() {
       println!("{}", serde_json::to_string_pretty(&result).unwrap());
     }
 
-    Some(("send-text", sub_matches)) => {
+    Some(("send", sub_matches)) => {
       let result = result::RpaResult::new();
 
       let handle = sub_matches.get_one::<String>("handle");
@@ -210,7 +201,7 @@ pub fn match_commands() {
 
       match key_emulation {
         true => {
-          activate_window(hwnd);
+          focus_window(hwnd);
           let duration = sub_matches
             .get_one::<String>("key-duration")
             .and_then(|s| Some(s.parse::<u64>().map_err(|_| "`key-duration` 参数必须是一个有效的整数")))
@@ -228,19 +219,19 @@ pub fn match_commands() {
       println!("{}", serde_json::to_string_pretty(&result).unwrap());
     }
 
-    Some(("active-window", sub_matches)) => {
+    Some(("focus", sub_matches)) => {
       let result = result::RpaResult::new();
 
       let handle = sub_matches.get_one::<String>("handle");
       let hwnd = string_to_hwnd(handle.unwrap()).unwrap();
 
-      activate_window(hwnd);
+      focus_window(hwnd);
 
       let result = result.build();
       println!("{}", serde_json::to_string_pretty(&result).unwrap());
     }
 
-    Some(("click-button", sub_matches)) => {
+    Some(("click", sub_matches)) => {
       let result = result::RpaResult::new();
 
       let handle = sub_matches.get_one::<String>("handle");
@@ -252,13 +243,13 @@ pub fn match_commands() {
       println!("{}", serde_json::to_string_pretty(&result).unwrap());
     }
 
-    Some(("enable-button", sub_matches)) => {
+    Some(("enable", sub_matches)) => {
       let result = result::RpaResult::new();
 
       let handle = sub_matches.get_one::<String>("handle");
       let hwnd = string_to_hwnd(handle.unwrap()).unwrap();
 
-      enable_button(hwnd);
+      enable_element(hwnd);
 
       let result = result.build();
       println!("{}", serde_json::to_string_pretty(&result).unwrap());

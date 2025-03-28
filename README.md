@@ -6,16 +6,17 @@ Rust | Windows
 
 通过 cli 命令与其它语言交互
 
-```bash
+```
 Usage: rs-rpa.exe <COMMAND>
 
 Commands:
-  find, -F, --find                查找目标窗口
-  find-element, --find-element    查找子元素句柄
-  send-text, --send-text          向目标句柄投递文本
-  active-window, --active-window  激活目标窗口
-  click-button, --click-button    触发按钮点击事件
-  help                            Print this message or the help of the given subcommand(s)
+  find, -f, --find          查找目标窗口
+  fel, --find-element       查找子元素句柄
+  send, --send-text         向目标句柄投递文本
+  focus, --focus-window     激活目标窗口
+  click, --click-button     触发按钮点击事件
+  enable, --enable-element  解除元素禁用
+  help                      Print this message or the help of the given subcommand(s)
 
 Options:
   -h, --help     Print help
@@ -26,8 +27,8 @@ Options:
 
 查找窗口句柄
 
-```bash
-Usage: rs-rpa.exe {find|--find|-F} [OPTIONS]
+```
+Usage: rs-rpa.exe {find|--find|-f} [OPTIONS]
 
 Options:
   -c, --class <class>...  目标窗口类名
@@ -37,12 +38,12 @@ Options:
   -h, --help              Print help
 ```
 
-## find-element
+## fel (--find-element)
 
 查找子元素句柄
 
 ```
-Usage: rs-rpa.exe {find-element|--find-element} [OPTIONS] --parent <parent>...
+Usage: rs-rpa.exe {fel|--find-element} [OPTIONS] --parent <parent>...
 
 Options:
   -p, --parent <parent>...  父窗口句柄
@@ -51,12 +52,12 @@ Options:
   -h, --help                Print help
 ```
 
-## send-text
+## send (--send-text)
 
 向目标句柄投递文本
 
-```bash
-Usage: rs-rpa.exe {send-text|--send-text} [OPTIONS] --handle <handle>...
+```
+Usage: rs-rpa.exe {send|--send-text} [OPTIONS] --handle <handle>...
 
 Options:
       --handle <handle>...           目标元素句柄
@@ -66,24 +67,36 @@ Options:
   -h, --help                         Print help
 ```
 
-## active-window
+## focus (--focus-window)
 
-激活目标窗口
+聚焦目标窗口
 
-```bash
-Usage: rs-rpa.exe {active-window|--active-window} --handle <handle>...
+```
+Usage: rs-rpa.exe {focus|--focus-window} --handle <handle>...
 
 Options:
       --handle <handle>...  目标窗口句柄
   -h, --help                Print help
 ```
 
-## click-button
+## click (--click-button)
 
 触发按钮点击事件
 
-```bash
-Usage: rs-rpa.exe {click-button|--click-button} --handle <handle>...
+```
+Usage: rs-rpa.exe {click|--click-button} --handle <handle>...
+
+Options:
+      --handle <handle>...  目标元素句柄
+  -h, --help                Print help
+```
+
+## enable (--enable-element)
+
+解除元素禁用
+
+```
+Usage: rs-rpa.exe {enable|--enable-element} --handle <handle>...
 
 Options:
       --handle <handle>...  目标元素句柄

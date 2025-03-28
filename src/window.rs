@@ -53,7 +53,7 @@ pub fn get_title_by_hwnd(hwnd: HWND) -> String {
 }
 
 /// 激活窗口
-pub fn activate_window(hwnd: HWND) -> bool {
+pub fn focus_window(hwnd: HWND) -> bool {
   unsafe { SetForegroundWindow(hwnd).as_bool() }
 }
 

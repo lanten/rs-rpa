@@ -1,5 +1,5 @@
 use rs_rpa::window::{
-  activate_window, enum_all_window_handles, enum_visible_window_handles, find_element_hwnd, get_class_by_hwnd,
+  focus_window, enum_all_window_handles, enum_visible_window_handles, find_element_hwnd, get_class_by_hwnd,
   get_process_id_by_hwnd, get_title_by_hwnd,
 };
 
@@ -63,7 +63,7 @@ fn test_activate_window() {
     let title = get_title_by_hwnd(*hwnd);
     println!("尝试激活窗口: {}", title);
 
-    let result = activate_window(*hwnd);
+    let result = focus_window(*hwnd);
     assert!(result, "激活窗口应该成功");
 
     // 给用户一点时间观察窗口是否被激活

@@ -22,7 +22,7 @@ pub fn send_text_to(textbox_hwnd: HWND, text: &str) {
 }
 
 /// 解除按钮禁用
-pub fn enable_button(button_hwnd: HWND) -> bool {
+pub fn enable_element(button_hwnd: HWND) -> bool {
   unsafe {
     // 启用按钮
     EnableWindow(button_hwnd, true).as_bool()
