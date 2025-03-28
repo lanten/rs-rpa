@@ -2,8 +2,6 @@
 
 基于 windows-rs 实现的 win32 gui rpa 工具
 
-Rust | Windows
-
 通过 cli 命令与其它语言交互
 
 ```
