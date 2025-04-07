@@ -2,8 +2,15 @@ use core::panic;
 use rs_rpa::window::get_process_id_by_hwnd;
 use std::sync::Once;
 use windows::{
-  core::*, Win32::Foundation::*, Win32::Graphics::Gdi::*, Win32::System::LibraryLoader::GetModuleHandleW,
-  Win32::UI::WindowsAndMessaging::*,
+  core::PCWSTR,
+  Win32::Foundation::{GetLastError, HWND, LPARAM, LRESULT, WPARAM},
+  Win32::Graphics::Gdi::UpdateWindow,
+  Win32::System::LibraryLoader::GetModuleHandleW,
+  Win32::UI::WindowsAndMessaging::{
+    CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, LoadCursorW, PostQuitMessage, RegisterClassW, ShowWindow,
+    TranslateMessage, BS_PUSHBUTTON, CW_USEDEFAULT, IDC_ARROW, MSG, SW_SHOW, WINDOW_EX_STYLE, WINDOW_STYLE, WM_DESTROY,
+    WNDCLASSW, WS_BORDER, WS_CHILD, WS_OVERLAPPEDWINDOW, WS_TABSTOP, WS_VISIBLE,
+  },
 };
 
 static INIT: Once = Once::new();
@@ -25,6 +32,8 @@ pub struct TestWindow {
   pub class_name: String,
   pub title: String,
   pub process_id: u32,
+  pub edit_hwnd: HWND,   // 输入框句柄
+  pub button_hwnd: HWND, // 按钮句柄
 }
 
 pub fn create_test_window() -> TestWindow {
@@ -74,6 +83,40 @@ pub fn create_test_window() -> TestWindow {
       panic!("Failed to create window, error: {}", GetLastError().0);
     }
 
+    // 创建输入框
+    let edit_hwnd = CreateWindowExW(
+      WINDOW_EX_STYLE::default(),
+      PCWSTR(windows::core::w!("EDIT").as_ptr()),
+      PCWSTR(windows::core::w!("").as_ptr()),
+      WS_CHILD | WS_VISIBLE | WS_BORDER | WINDOW_STYLE(0x0080), // ES_AUTOHSCROLL
+      50,
+      50,
+      200,
+      30,
+      Some(hwnd),
+      None,
+      Some(h_instance.into()),
+      None,
+    )
+    .unwrap();
+
+    // 创建按钮
+    let button_hwnd = CreateWindowExW(
+      WINDOW_EX_STYLE::default(),
+      PCWSTR(windows::core::w!("BUTTON").as_ptr()),
+      PCWSTR(windows::core::w!("Button").as_ptr()),
+      WS_TABSTOP | WS_VISIBLE | WS_CHILD | WINDOW_STYLE(BS_PUSHBUTTON as u32),
+      300,
+      50,
+      100,
+      30,
+      Some(hwnd),
+      None,
+      Some(h_instance.into()),
+      None,
+    )
+    .unwrap();
+
     let _ = ShowWindow(hwnd, SW_SHOW);
     let _ = UpdateWindow(hwnd);
 
@@ -82,6 +125,8 @@ pub fn create_test_window() -> TestWindow {
       class_name: window_class_name.to_string(),
       title: window_title.to_string(),
       process_id: get_process_id_by_hwnd(hwnd),
+      edit_hwnd,
+      button_hwnd,
     };
   }
 }
@@ -91,7 +136,7 @@ pub fn message_loop() {
   unsafe {
     let mut msg = MSG::default();
     while GetMessageW(&mut msg, Some(HWND::default()), 0, 0).into() {
-      TranslateMessage(&msg);
+      let _ = TranslateMessage(&msg);
       DispatchMessageW(&msg);
     }
   }

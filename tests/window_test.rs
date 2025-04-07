@@ -29,6 +29,9 @@ fn test_enum_visible_window_handles() {
 fn test_window_properties() {
   let test_win = test_utils::create_test_window();
 
+  // std::thread::spawn(move || test_utils::message_loop());
+  // test_utils::message_loop()
+
   println!("创建测试窗口成功 {:?}", test_win);
 
   let find_res = find_all_window_hwnd(test_win.class_name.clone(), test_win.title.clone(), false, true);
