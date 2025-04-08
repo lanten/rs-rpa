@@ -25,7 +25,7 @@ pub struct ElementInstance {
 }
 
 /// 查找符合条件的窗口
-pub fn find_all_window_hwnd(find_class: String, find_name: String, visible_only: bool, express: bool) -> RpaResult {
+pub fn find_all_window_hwnd(find_class: String, find_name: String, visible_only: bool, exact: bool) -> RpaResult {
   let result = RpaResult::new();
 
   let window_handles = match visible_only {
@@ -40,7 +40,7 @@ pub fn find_all_window_hwnd(find_class: String, find_name: String, visible_only:
     let title = get_title_by_hwnd(hwnd);
 
     if !find_class.is_empty() {
-      match express {
+      match exact {
         true => {
           if class != find_class {
             return;
@@ -55,7 +55,7 @@ pub fn find_all_window_hwnd(find_class: String, find_name: String, visible_only:
     }
 
     if !find_name.is_empty() {
-      match express {
+      match exact {
         true => {
           if title != find_name {
             return;
