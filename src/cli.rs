@@ -1,9 +1,9 @@
 use crate::{
-  element::{click_button, enable_element, send_text_to},
+  element::{click_button, disable_element, enable_element, get_disabled_state, get_text_value, send_text_to},
   find::{find_all_window_hwnd, find_element},
   keyboard::send_keys_to,
   utils::{hwnd::string_to_hwnd, result},
-  window::focus_window,
+  window::{destroy_window, focus_window},
 };
 use clap::{crate_description, crate_version, Arg, ArgAction, Command};
 
@@ -55,6 +55,19 @@ pub fn commands() -> Command {
             .action(ArgAction::SetTrue)
             .default_value("true"),
         ),
+    )
+    // destroy-window
+    //
+    // 销毁窗口
+    .subcommand(
+      Command::new("destroy").long_flag("destroy-window").about("销毁目标窗口").arg(
+        Arg::new("handle")
+          .long("handle")
+          .action(ArgAction::Set)
+          .required(true)
+          .num_args(1..)
+          .help("目标元素句柄"),
+      ),
     )
     // find-element
     //
@@ -128,6 +141,19 @@ pub fn commands() -> Command {
             .default_value("50"),
         ),
     )
+    // get-text
+    //
+    // 获取文本值
+    .subcommand(
+      Command::new("get-text").long_flag("get-text").about("获取文本值").arg(
+        Arg::new("handle")
+          .long("handle")
+          .action(ArgAction::Set)
+          .required(true)
+          .num_args(1..)
+          .help("目标元素句柄"),
+      ),
+    )
     // focus-window
     //
     // 聚焦窗口
@@ -141,7 +167,7 @@ pub fn commands() -> Command {
           .help("目标窗口句柄"),
       ),
     )
-    // click-button
+    // click
     //
     // 触发按钮点击事件
     .subcommand(
@@ -154,7 +180,7 @@ pub fn commands() -> Command {
           .help("目标元素句柄"),
       ),
     )
-    // enable-button
+    // enable
     //
     // 解除元素禁用
     .subcommand(
@@ -166,6 +192,38 @@ pub fn commands() -> Command {
           .num_args(1..)
           .help("目标元素句柄"),
       ),
+    )
+    // disable
+    //
+    // 解除元素禁用
+    .subcommand(
+      Command::new("disable")
+        .long_flag("disable-element")
+        .about("禁用目标元素")
+        .arg(
+          Arg::new("handle")
+            .long("handle")
+            .action(ArgAction::Set)
+            .required(true)
+            .num_args(1..)
+            .help("目标元素句柄"),
+        ),
+    )
+    // get-disabled
+    //
+    // 获取目标禁用状态
+    .subcommand(
+      Command::new("get-disabled")
+        .long_flag("get-disabled")
+        .about("获取目标元素禁用状态")
+        .arg(
+          Arg::new("handle")
+            .long("handle")
+            .action(ArgAction::Set)
+            .required(true)
+            .num_args(1..)
+            .help("目标元素句柄"),
+        ),
     )
 }
 
@@ -179,6 +237,15 @@ pub fn match_commands() {
       let exact = sub_matches.get_flag("exact");
       let visible_only = sub_matches.get_flag("visible-only");
       let result = find_all_window_hwnd(parse_args_string(class), parse_args_string(name), visible_only, exact);
+      println!("{}", serde_json::to_string_pretty(&result).unwrap());
+    }
+
+    Some(("destroy", sub_matches)) => {
+      let result = result::RpaResult::new();
+      let handle = sub_matches.get_one::<String>("handle");
+      let hwnd = string_to_hwnd(handle.unwrap()).unwrap();
+      destroy_window(hwnd);
+      let result = result.build();
       println!("{}", serde_json::to_string_pretty(&result).unwrap());
     }
 
@@ -219,6 +286,18 @@ pub fn match_commands() {
       println!("{}", serde_json::to_string_pretty(&result).unwrap());
     }
 
+    Some(("get-text", sub_matches)) => {
+      let result = result::RpaResult::new();
+
+      let handle = sub_matches.get_one::<String>("handle");
+      let hwnd = string_to_hwnd(handle.unwrap()).unwrap();
+
+      let text_value = get_text_value(hwnd);
+
+      let result = result.set_data(&text_value).build();
+      println!("{}", serde_json::to_string_pretty(&result).unwrap());
+    }
+
     Some(("focus", sub_matches)) => {
       let result = result::RpaResult::new();
 
@@ -252,6 +331,30 @@ pub fn match_commands() {
       enable_element(hwnd);
 
       let result = result.build();
+      println!("{}", serde_json::to_string_pretty(&result).unwrap());
+    }
+
+    Some(("disable", sub_matches)) => {
+      let result = result::RpaResult::new();
+
+      let handle = sub_matches.get_one::<String>("handle");
+      let hwnd = string_to_hwnd(handle.unwrap()).unwrap();
+
+      disable_element(hwnd);
+
+      let result = result.build();
+      println!("{}", serde_json::to_string_pretty(&result).unwrap());
+    }
+
+    Some(("get-disabled", sub_matches)) => {
+      let result = result::RpaResult::new();
+
+      let handle = sub_matches.get_one::<String>("handle");
+      let hwnd = string_to_hwnd(handle.unwrap()).unwrap();
+
+      let disabled_state = get_disabled_state(hwnd);
+
+      let result = result.set_data(&disabled_state).build();
       println!("{}", serde_json::to_string_pretty(&result).unwrap());
     }
 

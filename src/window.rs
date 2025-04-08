@@ -114,3 +114,10 @@ pub fn find_element_hwnd(parent_hwnd: HWND, class_name: Option<&str>, name: Opti
     return element_hwnd;
   }
 }
+
+/// 销毁窗口
+pub fn destroy_window(hwnd: HWND) {
+  unsafe {
+    windows::Win32::UI::WindowsAndMessaging::DestroyWindow(hwnd).unwrap();
+  }
+}

@@ -6,6 +6,7 @@ use windows::{
   Win32::Foundation::{GetLastError, HWND, LPARAM, LRESULT, WPARAM},
   Win32::Graphics::Gdi::UpdateWindow,
   Win32::System::LibraryLoader::GetModuleHandleW,
+  Win32::UI::Input::KeyboardAndMouse::EnableWindow,
   Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, LoadCursorW, PostQuitMessage, RegisterClassW, ShowWindow,
     TranslateMessage, BS_PUSHBUTTON, CW_USEDEFAULT, IDC_ARROW, MSG, SW_SHOW, WINDOW_EX_STYLE, WINDOW_STYLE, WM_DESTROY,
@@ -32,8 +33,9 @@ pub struct TestWindow {
   pub class_name: String,
   pub title: String,
   pub process_id: u32,
-  pub edit_hwnd: HWND,   // 输入框句柄
-  pub button_hwnd: HWND, // 按钮句柄
+  pub edit_hwnd: HWND,            // 输入框句柄
+  pub button_hwnd: HWND,          // 按钮句柄
+  pub disabled_button_hwnd: HWND, // 禁用按钮句柄
 }
 
 pub fn create_test_window() -> TestWindow {
@@ -117,6 +119,26 @@ pub fn create_test_window() -> TestWindow {
     )
     .unwrap();
 
+    // 创建禁用状态的按钮
+    let disabled_button_hwnd = CreateWindowExW(
+      WINDOW_EX_STYLE::default(),
+      PCWSTR(windows::core::w!("BUTTON").as_ptr()),
+      PCWSTR(windows::core::w!("Disabled Button").as_ptr()),
+      WS_TABSTOP | WS_VISIBLE | WS_CHILD | WINDOW_STYLE(BS_PUSHBUTTON as u32),
+      300,
+      100, // 在第一个按钮下方放置
+      150,
+      30,
+      Some(hwnd),
+      None,
+      Some(h_instance.into()),
+      None,
+    )
+    .unwrap();
+
+    // 禁用按钮
+    let _ = EnableWindow(disabled_button_hwnd, false);
+
     let _ = ShowWindow(hwnd, SW_SHOW);
     let _ = UpdateWindow(hwnd);
 
@@ -127,6 +149,7 @@ pub fn create_test_window() -> TestWindow {
       process_id: get_process_id_by_hwnd(hwnd),
       edit_hwnd,
       button_hwnd,
+      disabled_button_hwnd,
     };
   }
 }

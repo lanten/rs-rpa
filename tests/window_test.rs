@@ -30,7 +30,7 @@ fn test_window_properties() {
   let test_win = test_utils::create_test_window();
 
   // std::thread::spawn(move || test_utils::message_loop());
-  // test_utils::message_loop()
+  // test_utils::message_loop();
 
   println!("创建测试窗口成功 {:?}", test_win);
 
