@@ -5,6 +5,8 @@ use windows::Win32::UI::Input::KeyboardAndMouse::{
 };
 
 /// 发送键盘输入
+/// 
+/// - 如果目标程序以管理员身份运行, 则本函数也需要以管理员身份运行
 pub fn send_keys_to(text: &str, duration: Option<u64>) {
   let mut inputs = Vec::new();
 
@@ -31,6 +33,8 @@ pub fn send_keys_to(text: &str, duration: Option<u64>) {
         },
       },
     });
+
+    std::thread::sleep(std::time::Duration::from_millis(5)); // 等待5毫秒
 
     // 释放键
     inputs.push(INPUT {
